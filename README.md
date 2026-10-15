@@ -22,7 +22,18 @@
 
 ### 安装 `dws`
 
-从钉钉官方的 Workspace CLI 发行页下载对应平台的包，解压后把可执行文件放进 PATH：
+**最快的方式：让 Agent 帮你装。** 官方支持对话式安装，把下面这句原样发给 DSH 的会话
+（或任何能执行命令的 Agent），它会自己克隆、构建并把 `dws` 放好：
+
+```
+帮我安装 https://gitee.com/DingTalk-Real-AI/dingtalk-workspace-cli
+```
+
+钉钉官方的安装文档（含 Agent 安装 / 脚本安装 / NPM 安装 / Skills 安装四种方式）：
+
+<https://open.dingtalk.com/>
+
+**手动安装**：从发行页下载对应平台的包，解压后把可执行文件放进 PATH：
 
 <https://github.com/DingTalk-Real-AI/dingtalk-workspace-cli/releases>
 
@@ -43,7 +54,8 @@ dws auth status --format json
 ```
 
 `dws` 自带 `dws upgrade` 可以自我升级（会校验并原子替换，升级前自动备份，
-支持 `--rollback`）；`dws upgrade --check` 只检查不升级。
+支持 `--rollback`）；`dws upgrade --check` 只检查不升级。经 npm / pnpm / Homebrew
+安装的，交由原包管理器升级。
 
 ### 插件在哪里找它
 
@@ -225,13 +237,14 @@ dws <service> <cmd> --help    → 该命令接受的 flags
 
 | 现象 | 处理 |
 |---|---|
-| 面板显示「找不到 dws」 | 在配置里把 `executable` 写成 `dws.exe` 绝对路径，或把它放进 PATH |
+| 面板显示「找不到 dws」 | 先装 CLI（见 §1），或把已有的 `dws.exe` 绝对路径写进配置 `executable` |
 | 「未登录」 | 点面板里的**登录钉钉**，在浏览器打开返回的授权链接（5 分钟内有效） |
 | 工具报 `AUTH_TOKEN_EXPIRED` | 让用户重新登录，**不要**让 Agent 反复重试 |
 | 面板显示 `HTTP 404` / `HTTP 405` | Host 没有注册路由。最常见原因是 `apply` 中途抛错，见下面「Cordis 的三个反直觉语义」 |
 | 工具或路由整批消失 | 同上：`apply` 抛错，或 `inject` 里写了根 scope 上不存在的服务 |
 | 面板整片空白 | 面板带错误边界，正常会显示错误文字；真空白说明浏览器半边没加载，确认 `package.json` 的 `dsh.client` 并在重启后刷新页面 |
 | 状态一直「登录态需刷新」 | `refresh_token` 可能被别的设备轮转掉了；重新登录一次即可 |
+| 命令行为与文档不符 | 很可能是 CLI 版本差异。本插件按 `1.0.59` 编写测试；先 `dws version` 确认，再点**环境自检**跑 `dws doctor` |
 
 > 排查加载问题最快的办法不是看日志或截图，而是
 > `plugin_manager action=set_bundle`——它会把**原始激活错误**（含堆栈）直接报出来，且不用重启。
@@ -340,6 +353,15 @@ test/subprocess-double.mjs  ctx.subprocess 测试替身 + createStrictContext
 ---
 
 ## 10. 参考
+
+**钉钉 / dws 官方资源**
+
+- 钉钉开放平台（含 Workspace CLI 的 Agent / 脚本 / NPM / Skills 四种安装方式）：
+  <https://open.dingtalk.com/>
+- CLI 仓库（Gitee，支持一句话安装）：<https://gitee.com/DingTalk-Real-AI/dingtalk-workspace-cli>
+- CLI 发行页（各平台二进制）：<https://github.com/DingTalk-Real-AI/dingtalk-workspace-cli/releases>
+
+**本插件内部**
 
 - 钉钉 Workspace CLI 自身的使用契约（命令发现、产品路由、危险操作清单、错误处理），
   由本插件在运行时以技能形式注入给 Agent，见 `index.js` 的 `bundledSkillContent()`；
