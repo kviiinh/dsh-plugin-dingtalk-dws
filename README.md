@@ -76,6 +76,27 @@ plugin_manager action=install_bundle  target=github:kviiinh/dsh-plugin-dingtalk-
 
 `github:<owner>/<repo>` 是标准安装 spec，包从仓库直接取；本插件的两个依赖
 （`@deepseek-ai/dsh-tools`、`@deepseek-ai/schemastery`）会自动从 registry 装上。
+`git+https://github.com/<owner>/<repo>` 形式同样可用，pnpm 会把它规范化成上面的形状。
+
+### 用 dsh CLI 装
+
+```bash
+dsh plugin --profile <profile> add github:kviiinh/dsh-plugin-dingtalk-dws
+```
+
+`dsh plugin --profile <name> <pnpm-args...>` 是 **pnpm 的直通入口**，所以这条命令等价于在
+profile 目录里跑 `pnpm add <spec>`。
+
+> ⚠️ **它只完成一半。** `pnpm add` 会把包装进 profile 的 `node_modules`、写进
+> `dependencies`，但**不会**把这个包登记进 `dsh.profile.bundles`。loader 只装配
+> bundles 里列出的包，所以还要手工在 profile 的 `package.json` 里加一行，否则重启后
+> 插件不会出现：
+>
+> ```jsonc
+> "dsh": { "profile": { "bundles": [ /* … */ "dsh-plugin-dingtalk-dws" ] } }
+> ```
+>
+> 想一步到位就用上面的 `install_bundle`——它两者都做。
 
 > **装完需要重启 DSH。** Host 半边（工具/路由）在进程启动时装配，浏览器半边由
 > bundle 路由提供。只有**配置**是热重载的，**代码**不是。
