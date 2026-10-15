@@ -22,29 +22,16 @@
 
 ### 安装 `dws`
 
-**最快的方式：让 Agent 帮你装。** 官方支持对话式安装，把下面这句原样发给 DSH 的会话
-（或任何能执行命令的 Agent），它会自己克隆、构建并把 `dws` 放好：
+官方支持对话式安装：把下面这句原样发给 DSH 的会话（或任何能执行命令的 Agent），
+它会自己克隆、构建并把 `dws` 放好：
 
 ```
 帮我安装 https://gitee.com/DingTalk-Real-AI/dingtalk-workspace-cli
 ```
 
-钉钉官方的安装文档（含 Agent 安装 / 脚本安装 / NPM 安装 / Skills 安装四种方式）：
+钉钉官方的安装文档（Agent 安装 / 脚本安装 / NPM 安装 / Skills 安装四种方式）：
 
 <https://open.dingtalk.com/>
-
-**手动安装**：从发行页下载对应平台的包，解压后把可执行文件放进 PATH：
-
-<https://github.com/DingTalk-Real-AI/dingtalk-workspace-cli/releases>
-
-| 平台 | 资产名 |
-|---|---|
-| Windows x64 | `dws-windows-amd64.zip` |
-| Windows arm64 | `dws-windows-arm64.zip` |
-| macOS Intel | `dws-darwin-amd64.tar.gz` |
-| macOS Apple Silicon | `dws-darwin-arm64.tar.gz` |
-| Linux x64 | `dws-linux-amd64.tar.gz` |
-| Linux arm64 | `dws-linux-arm64.tar.gz` |
 
 装好后确认：
 
@@ -359,7 +346,6 @@ test/subprocess-double.mjs  ctx.subprocess 测试替身 + createStrictContext
 - 钉钉开放平台（含 Workspace CLI 的 Agent / 脚本 / NPM / Skills 四种安装方式）：
   <https://open.dingtalk.com/>
 - CLI 仓库（Gitee，支持一句话安装）：<https://gitee.com/DingTalk-Real-AI/dingtalk-workspace-cli>
-- CLI 发行页（各平台二进制）：<https://github.com/DingTalk-Real-AI/dingtalk-workspace-cli/releases>
 
 **本插件内部**
 
