@@ -78,7 +78,16 @@ plugin_manager action=install_bundle  target=github:kviiinh/dsh-plugin-dingtalk-
 （`@deepseek-ai/dsh-tools`、`@deepseek-ai/schemastery`）会自动从 registry 装上。
 `git+https://github.com/<owner>/<repo>` 形式同样可用，pnpm 会把它规范化成上面的形状。
 
-### 用 dsh CLI 装
+> **装完需要重启 DSH。** Host 半边（工具/路由）在进程启动时装配，浏览器半边由
+> bundle 路由提供。只有**配置**是热重载的，**代码**不是。
+>
+> 排查加载问题时，`plugin_manager action=set_bundle` 可以**不重启**就把原始激活
+> 错误（含堆栈）报出来——比翻日志或看现象快得多。
+
+下面两种是**备选路径，不是后续步骤**：按上面的方式装成功就不需要看。
+
+<details>
+<summary>备选：用 dsh CLI 装（pnpm 直通，需要补一步）</summary>
 
 ```bash
 dsh plugin --profile <profile> add github:kviiinh/dsh-plugin-dingtalk-dws
@@ -98,14 +107,10 @@ profile 目录里跑 `pnpm add <spec>`。
 >
 > 想一步到位就用上面的 `install_bundle`——它两者都做。
 
-> **装完需要重启 DSH。** Host 半边（工具/路由）在进程启动时装配，浏览器半边由
-> bundle 路由提供。只有**配置**是热重载的，**代码**不是。
->
-> 排查加载问题时，`plugin_manager action=set_bundle` 可以**不重启**就把原始激活
-> 错误（含堆栈）报出来——比翻日志或看现象快得多。
+</details>
 
 <details>
-<summary>从源码装 / 手工装配（等价做法，一般用不到）</summary>
+<summary>备选：从源码装 / 手工装配（改插件源码时才值得用）</summary>
 
 ```bash
 # 1) 依赖（@deepseek-ai/dsh-tools 必须与 Harness 正在使用的版本一致）
@@ -152,7 +157,7 @@ pnpm install
 | 字段 | 默认 | 说明 |
 |---|---|---|
 | `enabled` | `true` | 总开关。关掉后不注册任何工具、路由、技能 |
-| `executable` | `''` | `dws` 可执行文件的绝对路径。留空走上面第 2 节的自查找链 |
+| `executable` | `''` | `dws` 可执行文件的绝对路径。留空走第 1 节的自查找链 |
 | `profile` | `''` | 固定使用的钉钉组织/账号（`corpId:userId` 这类稳定标识）。留空用 `isCurrent=true` 的账号 |
 | `execTimeoutMs` | `60000` | 单条命令默认超时（上限 15 分钟，工具参数 `timeoutMs` 可单次覆盖） |
 | `maxOutputBytes` | `60000` | 回给模型的 JSON 输出上限，超出按 UTF-8 边界截断并标注 |
