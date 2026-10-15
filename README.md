@@ -91,7 +91,7 @@ plugin_manager action=install_bundle  target=github:kviiinh/dsh-plugin-dingtalk-
 
 1. 装好 `dws`（§1）；
 2. 装好本插件（上面）；
-3. **重启 DSH**，刷新页面。
+3. **重启 DSH**。
 
 **不需要改任何配置**——所有配置项都有可用默认值（`executable` 留空会自动查找 `dws`、
 `execTimeoutMs` 60 秒、输出上限 60 KB、技能与提示词默认注入），装完即用；
@@ -296,7 +296,7 @@ dws <service> <cmd> --help    → 该命令接受的 flags
 | 工具报 `AUTH_TOKEN_EXPIRED` | 让用户重新登录，**不要**让 Agent 反复重试 |
 | 面板显示 `HTTP 404` / `HTTP 405` | Host 没有注册路由。最常见原因是 `apply` 中途抛错，见下面「Cordis 的三个反直觉语义」 |
 | 工具或路由整批消失 | 同上：`apply` 抛错，或 `inject` 里写了根 scope 上不存在的服务 |
-| 面板整片空白 | 面板带错误边界，正常会显示错误文字；真空白说明浏览器半边没加载，确认 `package.json` 的 `dsh.client` 并在重启后刷新页面 |
+| 面板整片空白 | 面板带错误边界，正常会显示错误文字；真空白说明浏览器半边没加载，确认 `package.json` 里有 `dsh.client` 并重启 DSH |
 | 状态一直「登录态需刷新」 | `refresh_token` 可能被别的设备轮转掉了；重新登录一次即可 |
 | 命令行为与文档不符 | 很可能是 CLI 版本差异。本插件按 `1.0.59` 编写测试；先 `dws version` 确认，再点**环境自检**跑 `dws doctor` |
 
