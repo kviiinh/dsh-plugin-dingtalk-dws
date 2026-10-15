@@ -84,7 +84,27 @@ plugin_manager action=install_bundle  target=github:kviiinh/dsh-plugin-dingtalk-
 > 排查加载问题时，`plugin_manager action=set_bundle` 可以**不重启**就把原始激活
 > 错误（含堆栈）报出来——比翻日志或看现象快得多。
 
-下面两种是**备选路径，不是后续步骤**：按上面的方式装成功就不需要看。
+### 到这一步就能用了
+
+1. 装好 `dws`（§1）；
+2. 装好本插件（上面）；
+3. **重启 DSH**，刷新页面。
+
+**不需要改任何配置**——所有配置项都有可用默认值（`executable` 留空会自动查找 `dws`、
+`execTimeoutMs` 60 秒、输出上限 60 KB、技能与提示词默认注入），装完即用；
+要调才看 §3。
+
+`dws` 的登录态如果还没有，在面板里点一次**登录钉钉**即可（见 §4）。
+
+怎么确认真的通了：
+
+| 看哪里 | 通了的样子 |
+|---|---|
+| 设置 → 插件 → 钉钉连接器 → 那一行 | 状态灯绿色，显示「已连接」+ 你的组织与账号 |
+| 任意会话里问一句「钉钉连上了吗」 | 调 `dingtalk_auth_status`，回答组织与账号 |
+| 让它做件事，例如「查一下我今天的日程」 | 调 `dingtalk_dws`，返回真实数据 |
+
+**备选安装路径（不是后续步骤）**——按上面的方式装成功就不需要看：
 
 <details>
 <summary>备选：用 dsh CLI 装（pnpm 直通，需要补一步）</summary>
@@ -150,22 +170,24 @@ pnpm install
 
 ---
 
-## 3. 配置
+## 3. 配置（可选）
+
+**装完即用，不需要改任何配置。** 这一节是给"默认值不合用"时查的参考。
 
 配置优先级：profile 里 `- id: dingtalk-dws` 那一项 > 包内 `cordis.patch.yml` 默认值。
 
-| 字段 | 默认 | 说明 |
+| 字段 | 默认 | 什么时候才需要改 |
 |---|---|---|
-| `enabled` | `true` | 总开关。关掉后不注册任何工具、路由、技能 |
-| `executable` | `''` | `dws` 可执行文件的绝对路径。留空走第 1 节的自查找链 |
-| `profile` | `''` | 固定使用的钉钉组织/账号（`corpId:userId` 这类稳定标识）。留空用 `isCurrent=true` 的账号 |
-| `execTimeoutMs` | `60000` | 单条命令默认超时（上限 15 分钟，工具参数 `timeoutMs` 可单次覆盖） |
-| `maxOutputBytes` | `60000` | 回给模型的 JSON 输出上限，超出按 UTF-8 边界截断并标注 |
-| `exposeRawApi` | `false` | 是否允许 `dws api`（裸 OpenAPI 调用）。默认禁用，逼 Agent 走服务命令 |
-| `registerSkill` | `true` | 是否注册钉钉技能知识 + 注入提示词段落 |
+| `enabled` | `true` | 想临时停用整个插件 |
+| `executable` | `''` | `dws` 不在第 1 节的查找链上时，写绝对路径 |
+| `profile` | `''` | 想固定用某个钉钉组织/账号（`corpId:userId` 这类稳定标识）；留空用 `isCurrent=true` 的账号 |
+| `execTimeoutMs` | `60000` | 导出、批量类命令容易超时（上限 15 分钟，工具参数 `timeoutMs` 可单次覆盖） |
+| `maxOutputBytes` | `60000` | 返回太大、想更省 token（按 UTF-8 边界截断并标注） |
+| `exposeRawApi` | `false` | 确实需要调 `dws api`（裸 OpenAPI，默认禁用，逼 Agent 走服务命令） |
+| `registerSkill` | `true` | 不想给 Agent 注入钉钉技能与提示词 |
 
-改配置：直接编辑 `<DSH_HOME>/profiles/<profile>/cordis.patch.yml` 里 `- id: dingtalk-dws` 那一项
-（配置是热重载的，改完不用重启）。本插件当前**没有**做界面写回。
+改法：编辑 `<DSH_HOME>/profiles/<profile>/cordis.patch.yml` 里 `- id: dingtalk-dws`
+那一项——配置是热重载的，改完不用重启。本插件当前**没有**做界面写回。
 
 ---
 
