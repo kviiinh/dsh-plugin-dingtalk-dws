@@ -26,7 +26,7 @@
     "@deepseek-ai/schemastery": "^3.18.4"
   },
   "scripts": {
-    "test": "node test/selftest.mjs && node test/edge.mjs && node test/http.mjs && node test/prove-strict.mjs"
+    "test": "node test/selftest.mjs && node test/edge.mjs && node test/http.mjs && node test/missing.mjs && node test/prove-strict.mjs"
   },
   "dsh": {
     "bundle": {

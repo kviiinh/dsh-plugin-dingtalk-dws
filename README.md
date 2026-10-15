@@ -11,9 +11,43 @@
 
 ---
 
-## 1. 前置条件
+## 1. 前置条件：先装好 `dws`
 
-一个可用的 `dws` 可执行文件。插件按以下顺序查找，命中即用：
+**本插件不会下载或安装 `dws`，它只会去找。** 找不到时的行为是：
+
+- `dingtalk_dws` 直接报错，提示你指定路径；
+- 面板状态变成 `找不到 dws`，并在卡片里给出提示。
+
+它也不做任何"自动修复"——没有网络下载、没有 npm 安装、没有静默升级。
+
+### 安装 `dws`
+
+从钉钉官方的 Workspace CLI 发行页下载对应平台的包，解压后把可执行文件放进 PATH：
+
+<https://github.com/DingTalk-Real-AI/dingtalk-workspace-cli/releases>
+
+| 平台 | 资产名 |
+|---|---|
+| Windows x64 | `dws-windows-amd64.zip` |
+| Windows arm64 | `dws-windows-arm64.zip` |
+| macOS Intel | `dws-darwin-amd64.tar.gz` |
+| macOS Apple Silicon | `dws-darwin-arm64.tar.gz` |
+| Linux x64 | `dws-linux-amd64.tar.gz` |
+| Linux arm64 | `dws-linux-arm64.tar.gz` |
+
+装好后确认：
+
+```bash
+dws version
+dws auth status --format json
+```
+
+`dws` 自带 `dws upgrade` 可以自我升级（会校验并原子替换，升级前自动备份，
+支持 `--rollback`）；`dws upgrade --check` 只检查不升级。
+
+### 插件在哪里找它
+
+按以下顺序，命中即用：
 
 1. 插件配置里的 `executable`（绝对路径）；
 2. `$DSH_HOME/dsh-runtimes/dingtalk-dws/dws.exe`（DSH 受管位置）；
@@ -21,7 +55,8 @@
 4. `%USERPROFILE%\.local\bin\dws.exe`；
 5. PATH 上的裸名字 `dws`（通过 Harness 的 `subprocess.resolveExecutable` 解析）。
 
-> 插件按 `dws 1.0.59` 的行为编写。换版本后建议先点面板里的**环境自检**。
+> 本插件按 `dws 1.0.59` 的行为编写与测试。换版本后建议先点面板里的**环境自检**
+> 跑一次 `dws doctor`。
 
 ---
 
@@ -218,12 +253,16 @@ dws <service> <cmd> --help    → 该命令接受的 flags
 ## 8. 自检
 
 ```bash
-pnpm test                     # 等于下面四条依次执行
+pnpm test                     # 等于下面五条依次执行
 node test/selftest.mjs        # 注册形状 / 真实命令 / 拒绝策略 / 技能注入：31 项
 node test/edge.mjs            # 纯文本输出 / 坏参数 / 超时 / 凭证旁路：16 项
-node test/http.mjs            # 真实 HTTP 打路由 + 严格上下文回归：21 项
+node test/http.mjs            # 真实 HTTP 打路由 + 严格上下文回归：22 项
+node test/missing.mjs         # 没装 dws 时的降级行为：19 项
 node test/prove-strict.mjs    # 证明「严格上下文」测试替身真的有牙齿
 ```
+
+> 注意：`selftest.mjs` / `edge.mjs` / `http.mjs` 会**真的调用 `dws`**，所以需要先装好 CLI
+> 并至少登录过一次；`missing.mjs` 与 `prove-strict.mjs` 不需要。
 
 `selftest.mjs` 用假的 Cordis 上下文 + **真的 `dws.exe`** 跑通全部对外表面。
 
@@ -234,6 +273,10 @@ node test/prove-strict.mjs    # 证明「严格上下文」测试替身真的有
 `http.mjs` 在**真的 HTTP 监听**上发真实请求，验证 `GET /dingtalk-dws/status` 返回 200 且带真实组织名、
 错误方法返回 405、退出登录缺确认返回 400、未知子路径落到 fallback；验证**没有 `ctx.subprocess` 时**
 工具仍能通过 Node 原生进程跑通；最后用**严格上下文**（复刻 Cordis 的 inject 抛错）验证 `apply` 不再炸掉。
+
+`missing.mjs` 固化「没装 `dws`」时的行为：工具照常注册、`dingtalk_dws` 抛出可操作的错误、
+`dingtalk_auth_status` 降级为 `cli_missing`、并且**代码里不存在任何下载/安装/升级动作**。
+复现手法是把 `USERPROFILE` 指到一个空目录，让插件的候选路径全部落空（不碰真实文件）。
 
 > 为什么需要这一套：纯静态的假上下文会把服务直接塞进去，所以「注册逻辑看起来对」而真实运行是 404。
 > 真实 HTTP + 真实路由表 + 会抛错的 Proxy 替身，才抓得住这类问题。
