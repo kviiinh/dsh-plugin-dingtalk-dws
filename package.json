@@ -1,0 +1,43 @@
+{
+  "name": "dsh-plugin-dingtalk-dws",
+  "version": "0.1.0",
+  "private": true,
+  "description": "把官方钉钉 Workspace CLI（dws）接成 DSH 工具：Agent 可直接查通讯录/日程/群聊/待办/审批/文档，面板里可看连接状态并登录退出。",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "LICENSE",
+    "test/"
+  ],
+  "dependencies": {
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/schemastery": "^3.18.4"
+  },
+  "scripts": {
+    "test": "node test/selftest.mjs && node test/edge.mjs && node test/http.mjs && node test/prove-strict.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  }
+}

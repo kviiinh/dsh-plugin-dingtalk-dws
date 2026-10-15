@@ -1,0 +1,16 @@
+# 钉钉 Workspace CLI（dws）↔ DSH 连接器。
+#
+# 这一层只负责把插件行插进 profile。日常改配置就改
+# <DSH_HOME>/profiles/<profile>/cordis.patch.yml 里同样 id 的那一项。
+- insert:
+    - id: dingtalk-dws
+      name: 'dsh-plugin-dingtalk-dws'
+      config:
+        enabled: true
+        # 留空 = 优先用 'dws' 这个名字（PATH / DSH 受管运行时都会试），失败再试下面这个路径。
+        executable: ''
+        profile: ''
+        execTimeoutMs: 60000
+        maxOutputBytes: 60000
+        exposeRawApi: false
+        registerSkill: true

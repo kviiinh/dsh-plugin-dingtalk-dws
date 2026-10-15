@@ -1,0 +1,14 @@
+# 依赖（由 pnpm 还原；本插件的运行期依赖由 Harness 侧提供）
+node_modules/
+
+# 本地环境与编辑器产物
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# 本机 profile 备份 / 临时文件
+*.bak
+*.bak-*
+.cache/
