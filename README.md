@@ -61,17 +61,30 @@ dws auth status --format json
 
 ## 2. 安装
 
-推荐用 Harness 自带的 Plugin Manager 安装，**不要**手写 profile 的 `package.json` 或
-`cordis.patch.yml`，也不要在 profile 目录里跑 pnpm：
+在 DSH 的会话里发这句话就行：
 
 ```
-plugin_manager action=install_bundle  target=<本包绝对路径>
+安装插件 github:kviiinh/dsh-plugin-dingtalk-dws
 ```
 
-它会把包装进当前 profile、写好 patch，并返回 `application` 结果。
-`set_bundle` / `set_plugin` 可以**不重启**就报出激活结果，是排查加载问题的第一手段。
+它会调用 Harness 自带的 Plugin Manager（`install_bundle`）把包装进当前 profile、
+写好 patch，并返回结果。也可以自己直接调：
 
-手工安装（等价做法，供参考）：
+```
+plugin_manager action=install_bundle  target=github:kviiinh/dsh-plugin-dingtalk-dws
+```
+
+`github:<owner>/<repo>` 是标准安装 spec，包从仓库直接取；本插件的两个依赖
+（`@deepseek-ai/dsh-tools`、`@deepseek-ai/schemastery`）会自动从 registry 装上。
+
+> **装完需要重启 DSH。** Host 半边（工具/路由）在进程启动时装配，浏览器半边由
+> bundle 路由提供。只有**配置**是热重载的，**代码**不是。
+>
+> 排查加载问题时，`plugin_manager action=set_bundle` 可以**不重启**就把原始激活
+> 错误（含堆栈）报出来——比翻日志或看现象快得多。
+
+<details>
+<summary>从源码装 / 手工装配（等价做法，一般用不到）</summary>
 
 ```bash
 # 1) 依赖（@deepseek-ai/dsh-tools 必须与 Harness 正在使用的版本一致）
@@ -103,8 +116,11 @@ cd <DSH_HOME>/profiles/<profile>
 pnpm install
 ```
 
-> **改完必须重启 DSH**：Host 半边（工具/路由）在进程启动时装配，浏览器半边由 bundle 路由提供。
-> 只有**配置**是热重载的，**代码**不是——替换已安装包的代码需要重启才会载入新的模块世代。
+> 官方建议是不要手写 profile 的 `package.json` / `cordis.patch.yml`、也不要在
+> profile 目录里跑 pnpm，交给 `install_bundle` 更稳妥。上面这段只在改插件源码
+> 想免去每次重装时才值得用。
+
+</details>
 
 ---
 
@@ -243,8 +259,20 @@ dws <service> <cmd> --help    → 该命令接受的 flags
 
 ## 7. 卸载
 
-1. 用 `plugin_manager action=remove_bundle target=dsh-plugin-dingtalk-dws`；或
-2. 手工：从 profile 的 `dsh.profile.bundles` 与 `dependencies` 里删掉本包，然后 `pnpm install`，重启 DSH。
+在 DSH 的会话里发这句话就行：
+
+```
+卸载插件 dsh-plugin-dingtalk-dws
+```
+
+或者自己直接调：
+
+```
+plugin_manager action=remove_bundle  target=dsh-plugin-dingtalk-dws
+```
+
+从源码手工装配的，则从 profile 的 `dsh.profile.bundles` 与 `dependencies` 里删掉本包，
+`pnpm install` 后重启 DSH。
 
 插件不写任何全局状态。卸载后除 `dws` 自己的配置目录（`~/.dws`，官方 CLI 的数据目录，**不应删除**）之外没有残留。
 
