@@ -6,17 +6,18 @@
   "license": "MIT",
   "type": "module",
   "main": "index.js",
+  "icon": "./icon.png",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
     "./package.json": "./package.json",
-    "./icon": "./icon.svg"
+    "./icon": "./icon.png"
   },
   "files": [
     "index.js",
     "client.js",
     "cordis.patch.yml",
-    "icon.svg",
+    "icon.png",
     "README.md",
     "LICENSE",
     "test/"
